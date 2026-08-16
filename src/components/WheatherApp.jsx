@@ -19,6 +19,23 @@ const WheatherApp = () => {
             </div>
             <div className="weather">
                 <img src={sunny} alt="sunny" />
+                <div className="weather-type">Clear</div>
+                <div className="temp">28°</div>
+            </div>
+            <div className="weather-date">
+                <p>Sat, 15 Ago</p>
+            </div>
+            <div className="wheater-data">
+                <div className="humidity">
+                    <div className="data-name">Humidity</div>
+                    <i className="fa-solid fa-droplet"></i>
+                    <div className="data">35%</div>
+                </div>
+                <div className="wind">
+                    <div className="data-name">Wind</div>
+                    <i className="fa-solid fa-wind"></i>
+                    <div className="data">3 km/h</div>
+                </div>
             </div>
         </div>
       
