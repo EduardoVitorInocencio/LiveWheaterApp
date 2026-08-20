@@ -2,6 +2,7 @@ import sunny from '../assets/images/sunny.png'
 import cloudy from '../assets/images/cloudy.png'
 import rainy from '../assets/images/rainy.png'
 import snowy from '../assets/images/snowy.png'
+import { getWeatherInfo } from '../utils/weatherCode'
 import { useState } from 'react'
 
 const WheatherApp = () => {
@@ -11,6 +12,19 @@ const WheatherApp = () => {
 
   const handleInputChanges = (e) => {
     setLocation(e.target.value)
+  }
+
+  const handleKeyDown = (e) =>{
+    if (e.key === 'Enter'){
+      search(e.target.value)
+    }
+  }
+
+  const weatherImages = {
+    sunny,
+    cloudy,
+    rainy,
+    snowy
   }
 
   // Busca latitude e longitude pelo nome da cidade
@@ -61,6 +75,7 @@ const WheatherApp = () => {
       const response = await fetch(url)
 
       const weatherData = await response.json()
+      const weatherInfo = getWeatherInfo(weatherData.current.weather_code)
 
       console.log('Clima:')
       console.log(weatherData)
@@ -69,7 +84,9 @@ const WheatherApp = () => {
       setData({
         ...weatherData.current,
         city: coordinates.name,
-        country: coordinates.country
+        country: coordinates.country,
+        weatherType: weatherInfo.type,
+        weatherDescription: weatherInfo.description
       })
 
     } catch (error) {
@@ -103,6 +120,7 @@ const WheatherApp = () => {
               placeholder="Enter Location"
               value={location}
               onChange={handleInputChanges}
+              onKeyDown={handleKeyDown}
             />
 
             <i
@@ -115,11 +133,14 @@ const WheatherApp = () => {
         </div>
 
         <div className="weather">
-
-          <img src={sunny} alt="sunny" />
+          {/* 6. Dinamizar a imagem de acordo com o mapa */}
+          <img
+            src={weatherImages[data.weatherType]}
+            alt={data.weatherDescription}
+          />
 
           <div className="weather-type">
-            Clear
+            {data ? data.weatherType : 'Clear'}
           </div>
 
           <div className="temp">
