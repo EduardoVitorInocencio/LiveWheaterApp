@@ -7,7 +7,7 @@ import { useState } from 'react'
 
 const WheatherApp = () => {
 
-  const [data, setData] = useState([])
+  const [data, setData] = useState(null)
   const [location, setLocation] = useState("")
 
   const handleInputChanges = (e) => {
@@ -25,6 +25,20 @@ const WheatherApp = () => {
     cloudy,
     rainy,
     snowy
+  }
+
+  const formatDate = (dateTime) => {
+    if (!dateTime) {
+      return ''
+    }
+  
+    const date = new Date(dateTime)
+
+    return new Intl.DateTimeFormat('pt-BR', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short'
+    }).format(date) 
   }
 
   // Busca latitude e longitude pelo nome da cidade
@@ -69,6 +83,7 @@ const WheatherApp = () => {
         ?latitude=${latitude}
         &longitude=${longitude}
         &current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code
+        &timezone=auto
       `.replace(/\s/g, '')
 
       // 4. Buscar clima
@@ -135,10 +150,9 @@ const WheatherApp = () => {
         <div className="weather">
           {/* 6. Dinamizar a imagem de acordo com o mapa */}
           <img
-            src={weatherImages[data.weatherType]}
-            alt={data.weatherDescription}
+            src={data ? weatherImages[data.weatherType] : sunny}
+            alt={data ? data.weatherDescription : 'Clear sky'}
           />
-
           <div className="weather-type">
             {data ? data.weatherType : 'Clear'}
           </div>
@@ -150,8 +164,13 @@ const WheatherApp = () => {
         </div>
 
         <div className="weather-date">
-          <p>Sat, 15 Ago</p>
-        </div>
+          <p>
+            {data
+              ? formatDate(data.time)
+              : 'Sat, 15 Ago'
+            }
+          </p>
+        </div>          
 
         <div className="weather-data">
 
