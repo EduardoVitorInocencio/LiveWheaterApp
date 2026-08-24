@@ -2,6 +2,7 @@ import sunny from '../assets/images/sunny.png'
 import cloudy from '../assets/images/cloudy.png'
 import rainy from '../assets/images/rainy.png'
 import snowy from '../assets/images/snowy.png'
+
 import { getWeatherInfo } from '../utils/weatherCode'
 import { useState } from 'react'
 
@@ -14,9 +15,9 @@ const WheatherApp = () => {
     setLocation(e.target.value)
   }
 
-  const handleKeyDown = (e) =>{
-    if (e.key === 'Enter'){
-      search(e.target.value)
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      search(location)
     }
   }
 
@@ -27,18 +28,32 @@ const WheatherApp = () => {
     snowy
   }
 
+  // Background de acordo com o tipo do clima
+  const backgroundImages = {
+    sunny: 'linear-gradient(to right, #f3b07c, #fcd283)',
+    cloudy: 'linear-gradient(to right, #57d6d4, #71eeec)',
+    rainy: 'linear-gradient(to right, #5bc8fb, #80eaff)',
+    snowy: 'linear-gradient(to right, #aff2ff, #fff)'
+  }
+
+  // Background padrão enquanto não existem dados
+  const backgroundImage = data
+    ? backgroundImages[data.weatherType]
+    : backgroundImages.sunny
+
   const formatDate = (dateTime) => {
+
     if (!dateTime) {
       return ''
     }
-  
+
     const date = new Date(dateTime)
 
     return new Intl.DateTimeFormat('pt-BR', {
       weekday: 'short',
       day: '2-digit',
       month: 'short'
-    }).format(date) 
+    }).format(date)
   }
 
   // Busca latitude e longitude pelo nome da cidade
@@ -74,7 +89,7 @@ const WheatherApp = () => {
       console.log("Coordenadas:")
       console.log(coordinates)
 
-      // 2. Pegar a Latitude e Longitude
+      // 2. Pegar Latitude e Longitude
       const { latitude, longitude } = coordinates
 
       // 3. Montar URL do Clima
@@ -90,7 +105,10 @@ const WheatherApp = () => {
       const response = await fetch(url)
 
       const weatherData = await response.json()
-      const weatherInfo = getWeatherInfo(weatherData.current.weather_code)
+
+      const weatherInfo = getWeatherInfo(
+        weatherData.current.weather_code
+      )
 
       console.log('Clima:')
       console.log(weatherData)
@@ -105,16 +123,26 @@ const WheatherApp = () => {
       })
 
     } catch (error) {
-
       console.error(error.message)
-
     }
   }
 
   return (
-    <div className="container">
 
-      <div className="weather-app">
+    <div
+      className="container"
+      style={{ backgroundImage }}
+    >
+
+      <div
+        className="weather-app"
+        style={{
+          backgroundImage:
+            backgroundImage && backgroundImage.replace
+              ? backgroundImage.replace('to right', 'to top')
+              : null,
+        }}
+      >
 
         <div className="search">
 
@@ -148,29 +176,53 @@ const WheatherApp = () => {
         </div>
 
         <div className="weather">
-          {/* 6. Dinamizar a imagem de acordo com o mapa */}
+
+          {/* 6. Dinamizar a imagem de acordo com o clima */}
           <img
-            src={data ? weatherImages[data.weatherType] : sunny}
-            alt={data ? data.weatherDescription : 'Clear sky'}
+            src={
+              data
+                ? weatherImages[data.weatherType]
+                : sunny
+            }
+            alt={
+              data
+                ? data.weatherDescription
+                : 'Clear sky'
+            }
           />
+
           <div className="weather-type">
-            {data ? data.weatherType : 'Clear'}
+
+            {data
+              ? data.weatherDescription
+              : 'Clear'
+            }
+
           </div>
 
           <div className="temp">
-            {data ? data.temperature_2m:'28°'}
+
+            {data
+              ? `${Math.floor(data.temperature_2m)}°`
+              : null
+            }
+
           </div>
 
         </div>
 
         <div className="weather-date">
+
           <p>
+
             {data
               ? formatDate(data.time)
               : 'Sat, 15 Ago'
             }
+
           </p>
-        </div>          
+
+        </div>
 
         <div className="weather-data">
 
@@ -183,10 +235,12 @@ const WheatherApp = () => {
             <i className="fa-solid fa-droplet"></i>
 
             <div className="data">
+
               {data
                 ? `${data.relative_humidity_2m}%`
                 : '35%'
               }
+
             </div>
 
           </div>
@@ -200,10 +254,12 @@ const WheatherApp = () => {
             <i className="fa-solid fa-wind"></i>
 
             <div className="data">
+
               {data
                 ? `${data.wind_speed_10m} km/h`
                 : '3 km/h'
               }
+
             </div>
 
           </div>
@@ -213,6 +269,7 @@ const WheatherApp = () => {
       </div>
 
     </div>
+
   )
 }
 
